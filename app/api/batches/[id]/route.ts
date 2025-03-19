@@ -4,7 +4,7 @@ import { BatchService } from '@/services/batch.service';
 const batchService = new BatchService();
 
 export async function GET(
-  req: NextRequest,
+  _request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
@@ -25,11 +25,11 @@ export async function GET(
 }
 
 export async function PUT(
-  req: NextRequest,
+  request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const data = await req.json();
+    const data = await request.json();
     const batch = await batchService.update(params.id, data);
     return NextResponse.json(batch);
   } catch (error) {
@@ -41,7 +41,7 @@ export async function PUT(
 }
 
 export async function DELETE(
-  req: NextRequest,
+  _request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {

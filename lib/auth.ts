@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import { jwtVerify, createRemoteJWKSet } from 'jose';
 import { cache } from 'react';
+import { UserService } from '@/services/user.service';
 
 const JWKS_URL = process.env.AUTH_JWKS_URL;
 
@@ -21,7 +22,16 @@ export async function verifyAuth(req: NextRequest): Promise<string | null> {
       audience: process.env.AUTH_AUDIENCE,
     });
 
-    return payload.sub as string;
+    const userId = payload.sub as string;
+    
+    // Verify user exists and is active
+    const userService = new UserService();
+    const user = await userService.findById(userId);
+    if (!user || !user.isActive) {
+      return null;
+    }
+
+    return userId;
   } catch (error) {
     console.error('Auth verification failed:', error);
     return null;

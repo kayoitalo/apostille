@@ -74,6 +74,9 @@ const MOCK_BATCHES = [
 ];
 
 export class BatchService {
+  findOne(id: string, arg1: string | undefined) {
+    throw new Error('Method not implemented.');
+  }
   async create(data: any) {
     // Simulate creating a new batch
     const newBatch = {

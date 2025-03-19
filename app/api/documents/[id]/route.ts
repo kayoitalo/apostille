@@ -1,14 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { DocumentService } from '@/services/document.service';
+import { verifyAuth } from '@/lib/auth';
+import { updateDocumentSchema } from '@/lib/validations/document';
+import { ZodError } from 'zod';
 
 const documentService = new DocumentService();
 
 export async function GET(
-  req: NextRequest,
+  request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const userId = req.headers.get('user-id');
+    const userId = await verifyAuth(request);
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -20,25 +23,37 @@ export async function GET(
 
     return NextResponse.json(document);
   } catch (error) {
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    console.error('Error fetching document:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
 export async function PUT(
-  req: NextRequest,
+  request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const userId = req.headers.get('user-id');
+    const userId = await verifyAuth(request);
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const data = await req.json();
-    const document = await documentService.update(params.id, userId, data);
-    return NextResponse.json(document);
+    const body = await request.json();
+    
+    try {
+      const validatedData = updateDocumentSchema.parse(body);
+      const document = await documentService.update(params.id, userId, validatedData);
+      
+      return NextResponse.json(document);
+    } catch (error) {
+      if (error instanceof ZodError) {
+        return NextResponse.json({ error: error.errors }, { status: 400 });
+      }
+      throw error;
+    }
   } catch (error) {
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    console.error('Error updating document:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -47,14 +62,15 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const userId = req.headers.get('user-id');
+    const userId = await verifyAuth(req);
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     await documentService.delete(params.id, userId);
-    return new NextResponse(null, { status: 204 });
+    return NextResponse.json({ success: true });
   } catch (error) {
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    console.error('Error deleting document:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

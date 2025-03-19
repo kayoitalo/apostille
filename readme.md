@@ -1,3 +1,16 @@
+/app                 # Next.js App Router
+  /api               # API routes
+  /(routes)          # Client routes
+/components          # UI components
+/lib                 # Utility functions and services
+  /api               # API client functions
+  /auth              # Authentication logic
+  /db                # Database connections
+  /utils             # Utility functions
+/prisma              # Prisma schema and migrations
+/types               # TypeScript type definitions
+/middleware.ts       # Next.js middleware
+
 Here's the API documentation for integrating with the system:
 
 API Documentation
