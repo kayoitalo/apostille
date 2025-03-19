@@ -1,13 +1,13 @@
-///home/cc-papa/Downloads/Apostil2/project/app/api/documents/[id]/complete/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
 export async function POST(
-  req: NextRequest,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { notes } = await req.json();
+    const params = await context.params;
+    const { notes } = await request.json();
     
     const document = await prisma.document.update({
       where: { id: params.id },

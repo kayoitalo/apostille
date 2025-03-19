@@ -1,14 +1,14 @@
-//home/cc-papa/Downloads/Apostil2/project/app/api/documents/[id]/upload/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { cloudStorage } from '@/lib/storage';
 import { prisma } from '@/lib/prisma';
 
 export async function POST(
-  req: NextRequest,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const formData = await req.formData();
+    const params = await context.params;
+    const formData = await request.formData();
     const file = formData.get('file') as File;
     
     if (!file) {

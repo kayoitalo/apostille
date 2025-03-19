@@ -2,11 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
 export async function PUT(
-  req: NextRequest,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { isActive } = await req.json();
+    const params = await context.params;
+    const { isActive } = await request.json();
     
     const user = await prisma.user.update({
       where: { id: params.id },

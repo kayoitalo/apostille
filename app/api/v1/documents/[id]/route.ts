@@ -1,3 +1,4 @@
+// app/api/v1/documents/[id]/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { DocumentService } from '@/services/document.service';
 import { verifyAuth } from '@/lib/auth';
@@ -5,15 +6,16 @@ import { verifyAuth } from '@/lib/auth';
 const documentService = new DocumentService();
 
 export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const userId = await verifyAuth(req);
+    const userId = await verifyAuth(request);
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const params = await context.params;
     const document = await documentService.findById(params.id, userId);
     if (!document) {
       return NextResponse.json({ error: 'Document not found' }, { status: 404 });
@@ -26,16 +28,17 @@ export async function GET(
 }
 
 export async function PUT(
-  req: NextRequest,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const userId = await verifyAuth(req);
+    const userId = await verifyAuth(request);
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const data = await req.json();
+    const params = await context.params;
+    const data = await request.json();
     const document = await documentService.update(params.id, userId, data);
     return NextResponse.json(document);
   } catch (error) {
@@ -44,15 +47,16 @@ export async function PUT(
 }
 
 export async function DELETE(
-  req: NextRequest,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const userId = await verifyAuth(req);
+    const userId = await verifyAuth(request);
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const params = await context.params;
     await documentService.delete(params.id, userId);
     return new NextResponse(null, { status: 204 });
   } catch (error) {

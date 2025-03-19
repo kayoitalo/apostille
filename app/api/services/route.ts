@@ -22,9 +22,9 @@ export async function GET() {
   }
 }
 
-export async function POST(req: NextRequest) {
+export async function POST(request: NextRequest) {
   try {
-    const { code, name, fees } = await req.json();
+    const { code, name, fees } = await request.json();
 
     const service = await prisma.service.create({
       data: {

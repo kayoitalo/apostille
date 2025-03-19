@@ -1,4 +1,3 @@
-///home/cc-papa/Downloads/Apostil2/project/app/api/documents/[id]/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { DocumentService } from '@/services/document.service';
 import { verifyAuth } from '@/lib/auth';
@@ -9,7 +8,7 @@ const documentService = new DocumentService();
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const userId = await verifyAuth(request);
@@ -17,6 +16,7 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const params = await context.params;
     const document = await documentService.findById(params.id, userId);
     if (!document) {
       return NextResponse.json({ error: 'Document not found' }, { status: 404 });
@@ -31,7 +31,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const userId = await verifyAuth(request);
@@ -39,6 +39,7 @@ export async function PUT(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const params = await context.params;
     const body = await request.json();
     
     try {
@@ -59,15 +60,16 @@ export async function PUT(
 }
 
 export async function DELETE(
-  req: NextRequest,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const userId = await verifyAuth(req);
+    const userId = await verifyAuth(request);
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const params = await context.params;
     await documentService.delete(params.id, userId);
     return NextResponse.json({ success: true });
   } catch (error) {

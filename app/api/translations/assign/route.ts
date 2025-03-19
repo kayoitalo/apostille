@@ -2,14 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { verifyAuth } from '@/lib/auth';
 
-export async function POST(req: NextRequest) {
+export async function POST(request: NextRequest) {
   try {
-    const userId = await verifyAuth(req);
+    const userId = await verifyAuth(request);
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { documentId, translatorId } = await req.json();
+    const { documentId, translatorId } = await request.json();
 
     if (!documentId || !translatorId) {
       return NextResponse.json(
@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const assignment = await prisma.TranslationAssignment.create({
+    const assignment = await prisma.translationAssignment.create({
       data: {
         documentId,
         translatorId,

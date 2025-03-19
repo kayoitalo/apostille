@@ -4,11 +4,11 @@ import { prisma } from '@/lib/prisma';
 import { verifyAuth } from '@/lib/auth';
 
 export async function POST(
-  req: NextRequest,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const userId = await verifyAuth(req);
+    const userId = await verifyAuth(request);
     if (!userId) {
       return NextResponse.json(
         { error: 'Unauthorized' },
@@ -16,7 +16,8 @@ export async function POST(
       );
     }
 
-    const formData = await req.formData();
+    const params = await context.params;
+    const formData = await request.formData();
     const file = formData.get('file') as File;
     
     if (!file) {
