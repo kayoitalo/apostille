@@ -1,3 +1,4 @@
+///home/cc-papa/Downloads/Apostil2/project/app/api/documents/[id]/complete/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 

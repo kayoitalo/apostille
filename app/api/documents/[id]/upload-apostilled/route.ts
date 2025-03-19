@@ -1,3 +1,4 @@
+//home/cc-papa/Downloads/Apostil2/project/app/api/documents/[id]/upload-apostilled/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { cloudStorage } from '@/lib/storage';
 import { prisma } from '@/lib/prisma';

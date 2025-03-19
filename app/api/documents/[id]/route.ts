@@ -1,3 +1,4 @@
+///home/cc-papa/Downloads/Apostil2/project/app/api/documents/[id]/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { DocumentService } from '@/services/document.service';
 import { verifyAuth } from '@/lib/auth';
