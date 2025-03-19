@@ -1,9 +1,8 @@
 //claude olhou mas tá zuado ainda
 
-// import { Ratelimit } from '@upstash/ratelimit';
-// import { Redis } from '@upstash/redis';
+ import { Ratelimit } from '@upstash/ratelimit';
+ import { Redis } from '@upstash/redis';
 
-/*
 // Initialize Redis client
 let redis: Redis;
 let rateLimiter: Ratelimit | null = null;

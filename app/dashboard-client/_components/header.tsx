@@ -24,10 +24,10 @@ export function Header() {
         </div>
         
         {isAdmin && (
-          <Link href="/dashboard">
+          <Link href="/dashboard-translator">
             <Button variant="outline" size="sm">
               <LayoutDashboard className="mr-2 h-4 w-4" />
-              Painel Admin
+              Painel Tradutor
             </Button>
           </Link>
         )}
