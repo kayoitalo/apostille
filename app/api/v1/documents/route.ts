@@ -5,8 +5,11 @@ import { headers } from 'next/headers';
 
 const documentService = new DocumentService();
 
-// Enable Edge Runtime
-export const runtime = 'edge';
+export const config = {
+  runtime: "nodejs", 
+};
+
+// export const runtime = 'edge';
 
 // Configure caching
 export async function GET(request: NextRequest) {
