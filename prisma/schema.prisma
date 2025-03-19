@@ -1,0 +1,251 @@
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User Management
+model User {
+  id             String           @id @default(uuid())
+  email          String           @unique
+  name           String
+  password       String?
+  documentType   String           // CPF or CNPJ
+  documentNumber String
+  role           Role            @default(CLIENT)
+  isActive       Boolean         @default(true)
+  company        String?
+  phone          String?
+  address        Address?
+  batches        Batch[]
+  documents      Document[]
+  notifications  Notification[]
+  activities     Activity[]
+  translationAssignments TranslationAssignment[] @relation("TranslatorAssignments")
+  createdAt      DateTime        @default(now()) @db.Timestamptz
+  updatedAt      DateTime        @updatedAt @db.Timestamptz
+}
+
+model Address {
+  id            String    @id @default(uuid())
+  street        String
+  number        String
+  complement    String?
+  neighborhood  String
+  city          String
+  state         String
+  zipCode       String
+  userId        String    @unique
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt     DateTime  @default(now()) @db.Timestamptz
+  updatedAt     DateTime  @updatedAt @db.Timestamptz
+}
+
+// Document Management
+model Document {
+  id               String          @id @default(uuid())
+  title            String
+  registrantName   String
+  documentType     DocumentType    @default(BIRTH_CERTIFICATE)
+  notes            String?
+  internalNotes    String?         // Admin-only notes
+  status           DocumentStatus  @default(PENDING)
+  priority         Priority        @default(NORMAL)
+  fileUrl          String?
+  apostilledFileUrl String?
+  batchId          String?
+  batch            Batch?          @relation(fields: [batchId], references: [id])
+  userId           String
+  user             User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  serviceId        String
+  service          Service         @relation(fields: [serviceId], references: [id])
+  activities       Activity[]
+  comments         Comment[]
+  translationAssignments TranslationAssignment[]
+  createdAt        DateTime        @default(now()) @db.Timestamptz
+  updatedAt        DateTime        @updatedAt @db.Timestamptz
+
+  @@index([userId])
+  @@index([batchId])
+  @@index([serviceId])
+}
+
+model Batch {
+  id          String      @id @default(uuid())
+  name        String
+  notes       String?
+  status      BatchStatus @default(PENDING)
+  progress    Int         @default(0)
+  priority    Priority    @default(NORMAL)
+  userId      String
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  documents   Document[]
+  activities  Activity[]
+  createdAt   DateTime    @default(now()) @db.Timestamptz
+  updatedAt   DateTime    @updatedAt @db.Timestamptz
+
+  @@index([userId])
+}
+
+// Service and Fee Management
+model Service {
+  id          String     @id @default(uuid())
+  code        String     @unique
+  name        String
+  description String?
+  isActive    Boolean    @default(true)
+  fees        Fee[]
+  documents   Document[]
+  createdAt   DateTime   @default(now()) @db.Timestamptz
+  updatedAt   DateTime   @updatedAt @db.Timestamptz
+}
+
+model Fee {
+  id        String   @id @default(uuid())
+  type      FeeType
+  value     Float
+  serviceId String
+  service   Service  @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @db.Timestamptz
+  updatedAt DateTime @updatedAt @db.Timestamptz
+
+  @@index([serviceId])
+}
+
+// Communication and Tracking
+model Comment {
+  id         String   @id @default(uuid())
+  content    String
+  documentId String
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now()) @db.Timestamptz
+  updatedAt  DateTime @updatedAt @db.Timestamptz
+
+  @@index([documentId])
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  type      NotificationType
+  title     String
+  message   String
+  isRead    Boolean         @default(false)
+  userId    String
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime        @default(now()) @db.Timestamptz
+  updatedAt DateTime        @updatedAt @db.Timestamptz
+
+  @@index([userId])
+}
+
+model Activity {
+  id          String        @id @default(uuid())
+  type        ActivityType
+  description String
+  userId      String
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  documentId  String?
+  document    Document?    @relation(fields: [documentId], references: [id])
+  batchId     String?
+  batch       Batch?       @relation(fields: [batchId], references: [id])
+  createdAt   DateTime     @default(now()) @db.Timestamptz
+
+  @@index([userId])
+  @@index([documentId])
+  @@index([batchId])
+}
+
+model TranslationAssignment {
+  id              String    @id @default(uuid())
+  documentId      String
+  document        Document  @relation(fields: [documentId], references: [id])
+  translatorId    String
+  translator      User      @relation("TranslatorAssignments", fields: [translatorId], references: [id])
+  status          TranslationStatus @default(PENDING)
+  translatedFileUrl String?
+  notes           String?
+  assignedAt      DateTime  @default(now())
+  completedAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([documentId])
+  @@index([translatorId])
+}
+
+// Enums
+enum Role {
+  ADMIN
+  CLIENT
+  TRANSLATOR
+}
+
+enum BatchStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  REJECTED
+}
+
+enum DocumentStatus {
+  PENDING
+  REVIEWING
+  COMPLETED
+  REJECTED
+}
+
+enum DocumentType {
+  BIRTH_CERTIFICATE
+  MARRIAGE_CERTIFICATE
+  DEATH_CERTIFICATE
+  POLICE_RECORD
+  SCHOOL_RECORD
+  POWER_OF_ATTORNEY
+  OTHER
+}
+
+enum Priority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+enum FeeType {
+  emolumento
+  ccrcpn
+  iss
+}
+
+enum NotificationType {
+  DOCUMENT_UPLOADED
+  DOCUMENT_COMPLETED
+  DOCUMENT_REJECTED
+  BATCH_COMPLETED
+  COMMENT_ADDED
+  SYSTEM
+}
+
+enum ActivityType {
+  DOCUMENT_CREATED
+  DOCUMENT_UPDATED
+  DOCUMENT_COMPLETED
+  DOCUMENT_REJECTED
+  BATCH_CREATED
+  BATCH_UPDATED
+  BATCH_COMPLETED
+  COMMENT_ADDED
+  USER_LOGIN
+  SYSTEM_EVENT
+}
+
+enum TranslationStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  REJECTED
+}
