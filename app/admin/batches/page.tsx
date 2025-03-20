@@ -62,7 +62,7 @@ export default function AdminBatchesPage() {
                     <p className="text-sm text-muted-foreground">Lais M. Fidelis</p>
                     <p className="text-xs text-muted-foreground">Obs: Urgente</p>
                   </div>
-                  <CheckCircle className="h-5 w-5 text-green-500" />
+                  <CheckCircle className="h-5 w-5" />
                 </div>
                 
                 <div className="p-3 flex items-center justify-between">
@@ -70,7 +70,7 @@ export default function AdminBatchesPage() {
                     <h4 className="font-medium">Certidão de Casamento</h4>
                     <p className="text-sm text-muted-foreground">Kayo Italo</p>
                   </div>
-                  <Clock className="h-5 w-5 text-yellow-500" />
+                  <Clock className="h-5 w-5" />
                 </div>
               </div>
             </div>
