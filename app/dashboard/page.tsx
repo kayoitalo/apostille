@@ -180,8 +180,8 @@ export default function DashboardPage() {
         color: '#6b7280', // Cor cinza para o texto da legenda
       }}
     />
-    <Bar dataKey="total" fill="#d1d5db" name="Total de Documentos" />
-    <Bar dataKey="revenue" fill="#ffffff" name="Receita" />
+    <Bar dataKey="total" fill="#d1d5db" name="Quantidade" />
+    <Bar dataKey="revenue" fill="#ffffff" name="Receita (R$)" />
   </BarChart>
             </ResponsiveContainer>
           </CardContent>
