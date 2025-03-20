@@ -1,6 +1,20 @@
 "use client";
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts"; 
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -16,8 +30,7 @@ import {
   DollarSign,
   BarChart3,
 } from "lucide-react";
-// Importing chart components from shadcn/ui
-import { Bar } from "@/components/ui/chart";
+
 interface CompanyStats {
   id: string;
   name: string;
@@ -31,6 +44,7 @@ interface CompanyStats {
     revenue: number;
   }[];
 }
+
 const EXAMPLE_STATS: CompanyStats[] = [
   {
     id: "1",
@@ -59,30 +73,22 @@ const EXAMPLE_STATS: CompanyStats[] = [
     ]
   }
 ];
+
 export default function DashboardPage() {
   const [selectedCompany, setSelectedCompany] = useState<string>("");
+
   const stats = selectedCompany
     ? EXAMPLE_STATS.find(s => s.id === selectedCompany)
     : EXAMPLE_STATS[0];
-  const chartData = stats ? {
-    labels: stats.serviceBreakdown.map(s => s.name),
-    datasets: [
-      {
-        label: 'Quantidade',
-        data: stats.serviceBreakdown.map(s => s.count),
-        backgroundColor: 'hsl(var(--muted))',
-        borderColor: 'hsl(var(--border))',
-        borderWidth: 1,
-      },
-      {
-        label: 'Receita (R$)',
-        data: stats.serviceBreakdown.map(s => s.revenue),
-        backgroundColor: 'hsl(var(--accent))',
-        borderColor: 'hsl(var(--border))',
-        borderWidth: 1,
-      }
-    ]
-  } : { labels: [], datasets: [] };
+
+  const chartData = stats
+    ? stats.serviceBreakdown.map(service => ({
+        name: service.name,
+        total: service.count,
+        revenue: service.revenue,
+      }))
+    : [];
+
   return (
     <div className="space-y-8">
       <div className="flex justify-between items-center">
@@ -100,6 +106,7 @@ export default function DashboardPage() {
           </SelectContent>
         </Select>
       </div>
+
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -148,30 +155,38 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
       </div>
+
       <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle>Serviços por Tipo</CardTitle>
           </CardHeader>
           <CardContent>
-            <Bar
-              data={chartData}
-              options={{
-                responsive: true,
-                scales: {
-                  y: {
-                    beginAtZero: true,
-                  },
-                },
-                plugins: {
-                  legend: {
-                    position: 'top' as const,
-                  },
-                },
-              }}
-            />
+            <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={chartData}>
+    <XAxis dataKey="name" />
+    <YAxis />
+    <Tooltip
+      contentStyle={{
+        backgroundColor: '#333',   // Fundo escuro para o Tooltip
+        color: '#fff',             // Texto branco
+        borderRadius: '4px',       // Borda arredondada
+        padding: '8px',            // Espaçamento interno
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', // Sombra para destacar
+      }}
+    />
+    <Legend
+      wrapperStyle={{
+        color: '#6b7280', // Cor cinza para o texto da legenda
+      }}
+    />
+    <Bar dataKey="total" fill="#d1d5db" name="Total de Documentos" />
+    <Bar dataKey="revenue" fill="#ffffff" name="Receita" />
+  </BarChart>
+            </ResponsiveContainer>
           </CardContent>
         </Card>
+
         <Card>
           <CardHeader>
             <CardTitle>Detalhamento de Serviços</CardTitle>
