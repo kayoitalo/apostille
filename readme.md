@@ -1,26 +1,66 @@
-/app                 # Next.js App Router
-  /api               # API routes
-  /(routes)          # Client routes
-/components          # UI components
-/lib                 # Utility functions and services
-  /api               # API client functions
-  /auth              # Authentication logic
-  /db                # Database connections
-  /utils             # Utility functions
-/prisma              # Prisma schema and migrations
-/types               # TypeScript type definitions
-/middleware.ts       # Next.js middleware
+# Project Structure
 
-Here's the API documentation for integrating with the system:
+```
+.
+├── app/                          # Next.js App Router
+│   ├── admin/                    # Admin section
+│   ├── api/                      # API routes
+│   ├── dashboard/                # Dashboard section
+│   ├── dashboard-client/         # Client dashboard
+│   ├── dashboard-translator/     # Translator dashboard
+│   ├── login/                    # Login section
+│   ├── globals.css              # Global styles
+│   ├── layout.tsx               # Root layout
+│   └── page.tsx                 # Root page
+├── components/                   # UI components
+│   ├── ui/                      # UI component library
+│   ├── theme-provider.tsx       # Theme context provider
+│   └── theme-toggle.tsx         # Theme toggle component
+├── hooks/                       # Custom React hooks
+│   ├── use-mobile.tsx          # Mobile detection hook
+│   └── use-toast.ts            # Toast notification hook
+├── lib/                        # Utility functions and services
+│   ├── validations/           # Form validation schemas
+│   ├── auth.ts                # Authentication utilities
+│   ├── pdf.ts                 # PDF handling utilities
+│   ├── prisma.ts             # Prisma client configuration
+│   ├── rate-limit.ts         # Rate limiting utilities
+│   ├── storage.ts            # Storage utilities
+│   └── utils.ts              # General utilities
+├── prisma/                    # Prisma ORM
+│   └── migrations/           # Database migrations
+├── services/                  # Business logic services
+│   ├── batch.service.ts      # Batch processing service
+│   ├── document.service.ts   # Document handling service
+│   └── user.service.ts       # User management service
+├── src/                      # Source directory
+│   ├── lib/                  # Additional libraries
+│   ├── services/            # Additional services
+│   └── types/              # TypeScript type definitions
+├── ARCHITECTURES.md         # Architecture documentation
+├── ARCHITECTURES RESUME.md  # Architecture summary
+├── components.json         # UI components configuration
+├── middleware.ts          # Next.js middleware
+├── next.config.ts        # Next.js configuration
+├── package.json          # Project dependencies
+├── postcss.config.js    # PostCSS configuration
+├── tailwind.config.ts   # Tailwind CSS configuration
+└── tsconfig.json        # TypeScript configuration
+```
 
-API Documentation
-Authentication
+# API Documentation
+
+## Authentication
+
 All API requests must include an Authorization header with a Bearer token:
 
-
+```
 Authorization: Bearer <your_jwt_token>
-Login
+```
 
+## Login
+
+```
 POST /api/v1/auth
 Content-Type: application/json
 
@@ -28,9 +68,11 @@ Content-Type: application/json
   "email": "user@example.com",
   "password": "password"
 }
+```
+
 Response:
 
-
+```
 {
   "token": "jwt_token_here",
   "user": {
@@ -40,23 +82,36 @@ Response:
     "role": "CLIENT"
   }
 }
-Documents
-List Documents
+```
 
+## Documents
+
+### List Documents
+
+```
 GET /api/v1/documents
-Create Document
+```
 
+### Create Document
+
+```
 POST /api/v1/documents
 Content-Type: multipart/form-data
 
 file: [PDF File]
 title: "Document Title"
 registrantName: "Person Name"
-Get Document
+```
 
+### Get Document
+
+```
 GET /api/v1/documents/{id}
-Update Document
+```
 
+### Update Document
+
+```
 PUT /api/v1/documents/{id}
 Content-Type: application/json
 
@@ -64,25 +119,38 @@ Content-Type: application/json
   "title": "Updated Title",
   "notes": "Additional notes"
 }
-Delete Document
+```
 
+### Delete Document
+
+```
 DELETE /api/v1/documents/{id}
-Batches
-List Batches
+```
 
+## Batches
+
+### List Batches
+
+```
 GET /api/v1/batches
-Create Batch
+```
 
+### Create Batch
+
+```
 POST /api/v1/batches
 Content-Type: multipart/form-data
 
 file: [PDF File]
 name: "Batch Name"
 notes: "Batch Notes"
-Integration Example (TypeScript)
+```
+
+## Integration Example (TypeScript)
+
 Here's how to integrate the API into your system:
 
-
+```typescript
 // api-client.ts
 class ApiClient {
   private baseUrl: string;
@@ -178,19 +246,23 @@ const documents = await api.getDocuments();
 // Create batch
 const batchFile = new File(['...'], 'batch.pdf', { type: 'application/pdf' });
 await api.createBatch(batchFile, 'January Documents', 'Urgent processing');
+```
+
 This API provides all the functionality available in the client dashboard. The client can:
 
-Authenticate users
-Manage individual documents
-Create and manage document batches
-Track document status
-Add notes and observations
+- Authenticate users
+- Manage individual documents
+- Create and manage document batches
+- Track document status
+- Add notes and observations
+
 Important security considerations:
 
-Always use HTTPS for API requests
-Store the JWT token securely
-Implement proper error handling
-Add rate limiting for API endpoints
-Validate file types and sizes
-Implement request timeout handling
+- Always use HTTPS for API requests
+- Store the JWT token securely
+- Implement proper error handling
+- Add rate limiting for API endpoints
+- Validate file types and sizes
+- Implement request timeout handling
+
 The API follows REST principles and uses standard HTTP status codes. All responses are in JSON format except for file uploads which use multipart/form-data.
